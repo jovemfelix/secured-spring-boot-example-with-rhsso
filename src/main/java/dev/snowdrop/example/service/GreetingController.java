@@ -35,8 +35,18 @@ public class GreetingController {
         this.properties = properties;
     }
 
-    @RequestMapping("/api/greeting")
-    public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-        return new Greeting(counter.incrementAndGet(), String.format(properties.getMessage(), name));
+    @RequestMapping("/api/openstack-users/hello")
+    public Greeting openstackUsers(@RequestParam(value = "name", defaultValue = "World") String name) {
+        return new Greeting(counter.incrementAndGet(), String.format(properties.getMessage(), name, "openstack-users"));
+    }
+
+    @RequestMapping("/api/operador/hello")
+    public Greeting operador(@RequestParam(value = "name", defaultValue = "World") String name) {
+        return new Greeting(counter.incrementAndGet(), String.format(properties.getMessage(), name, "operador"));
+    }
+
+    @RequestMapping("/api/operador-restrito/hello")
+    public Greeting operadorRestrito(@RequestParam(value = "name", defaultValue = "World") String name) {
+        return new Greeting(counter.incrementAndGet(), String.format(properties.getMessage(), name, "operador-restrito"));
     }
 }

@@ -16,10 +16,13 @@
  */
 package dev.snowdrop.example.jwt;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import dev.snowdrop.example.SecurityConfiguration;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +34,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  * Converts a Keycloak JWT token to {@link AbstractAuthenticationToken}.
  */
 public class KeycloakAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+    private Logger logger = LoggerFactory.getLogger(KeycloakAuthenticationConverter.class);
 
     private final JwtAuthenticationConverter delegate;
 
@@ -44,7 +48,7 @@ public class KeycloakAuthenticationConverter implements Converter<Jwt, AbstractA
         return delegate.convert(jwt);
     }
 
-    private List<GrantedAuthority> convertRoles(List<String> keycloakRoles) {
+    private List<GrantedAuthority> convertRoles(Set<String> keycloakRoles) {
         List<GrantedAuthority> grantedAuthorities = new LinkedList<>();
         for (String role : keycloakRoles) {
             grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role));
@@ -53,8 +57,41 @@ public class KeycloakAuthenticationConverter implements Converter<Jwt, AbstractA
     }
 
     @SuppressWarnings("unchecked")
-    private List<String> extractRoles(Jwt jwt) {
-        Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
-        return (List<String>) realmAccess.get("roles");
+    private Set<String> extractRoles(Jwt jwt) {
+//        Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+//        List<String> roles = (List<String>) realmAccess.get("roles");
+        Set<String> roles = extractRolesFromGroups(jwt);
+//        Set<String> roles = extractRolesFromClients(jwt);
+
+        logger.info("[extractRoles] {}", roles);
+        return roles;
+    }
+
+    private Set<String> extractRolesFromGroups(Jwt jwt) {
+        JSONArray groups = (JSONArray) jwt.getClaims().get("groups");
+
+        Set<String> roles = new HashSet<>();
+        for (Object s : groups) {
+            roles.add(s.toString());
+        }
+
+        return roles;
+    }
+
+    private Set<String> extractRolesFromClients(Jwt jwt) {
+        Map<String, Object> resourceAccess = (Map<String, Object>) jwt.getClaims().get("resource_access");
+
+        Set<String> roles = new HashSet<String>();
+        for (String key : resourceAccess.keySet()) {
+            logger.debug("[extractRoles] key {}", key);
+            JSONObject json = (JSONObject) resourceAccess.get(key);
+
+            logger.debug("[extractRoles] json {}", json);
+
+            for (Object s : (JSONArray) json.get("roles")) {
+                roles.add(s.toString());
+            }
+        }
+        return roles;
     }
 }

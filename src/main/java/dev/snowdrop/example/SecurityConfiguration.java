@@ -16,12 +16,6 @@
  */
 package dev.snowdrop.example;
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-
 import dev.snowdrop.example.jwt.JwtProperties;
 import dev.snowdrop.example.jwt.KeycloakAuthenticationConverter;
 import org.apache.commons.codec.binary.Base64;
@@ -31,6 +25,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 @Component
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -43,14 +45,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+//        http.cors().and().csrf().disable()
+        http.cors().configurationSource(request -> { // https://stackoverflow.com/questions/40286549/spring-boot-security-cors
+            CorsConfiguration cors = new CorsConfiguration();
+            cors.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+            cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            cors.setAllowedHeaders(Arrays.asList("*"));
+            return cors;
+        }).and()
                 .authorizeRequests(registry -> registry
-                        // Require authentication for REST API access
-                        .antMatchers("/api/*").authenticated()
-                        // Only allow example-admin (e.g. Alice) to access the REST API
-                        .antMatchers("/api/*").hasRole("example-admin")
-                        // Allow free access to the rest of the resources
-                        .anyRequest().permitAll()
+                                // Require authentication for REST API access
+//                        .antMatchers("/api/*").authenticated()
+                                // Only allow example-admin (e.g. Alice) to access the REST API
+                                .antMatchers("/api/openstack-users/*").hasRole("openstack-users")
+                                .antMatchers("/api/operador/*").hasRole("operador")
+                                .antMatchers("/api/operador-restrito/*").hasRole("operador-restrito")
+                                // Allow free access to the rest of the resources
+                                .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(configurer -> configurer
                         .jwt(customizer -> customizer
