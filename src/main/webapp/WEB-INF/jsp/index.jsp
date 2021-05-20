@@ -12,15 +12,16 @@
 
     <div>
         <h1>Secure HTTP API - Spring Boot</h1>
-        <p class="lead">The mission expands on the REST API Level 0 Example by securing a REST endpoint using <a
-                href="https://access.redhat.com/products/red-hat-single-sign-on">Red Hat SSO</a>. Red Hat SSO implements the
-            OAuth 2.0 specification and uses it to issue access tokens to provide clients with various access rights to secured
-            resources. Securing an application with SSO enables you to add security to your applications while centralizing the
-            security configuration.
+        <p class="lead">A miss&atilde;o se expande no Exemplo REST API N&iacute;vel 0, protegendo um endpoint REST usando o
+            <a href="https://access.redhat.com/products/red-hat-single-sign-on">Red Hat SSO</a>.
+            O Red Hat SSO implementa a especifica&ccedil;&atilde;o OAuth 2.0 e a usa para emitir tokens de acesso para fornecer aos
+            clientes v&aacute;rios direitos de acesso a recursos protegidos.
+            Proteger um aplicativo com SSO permite adicionar seguran&ccedil;a aos seus aplicativos enquanto centraliza a configura&ccedil;&atilde;o de seguran&ccedil;a.
         </p>
 
-        <h2>Using the greeting service</h2>
-        <p class="lead">The greeting service is a protected endpoint. You will need to login first.
+        <h2>Usando o servi&ccedil;o de sauda&ccedil;&atilde;o</h2>
+        <p class="lead">O servi&ccedil;o de sauda&ccedil;&atilde;o &eacute; um endpoint protegido.
+            Voc&ecirc; precisar&aacute; fazer o login primeiro.
         </p>
 
         <div class=form-group>
